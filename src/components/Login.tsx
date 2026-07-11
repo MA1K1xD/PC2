@@ -1,41 +1,31 @@
 import React, {useState} from "react";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
+
 import api from "../api"
 
-interface RegisterBody{
+interface LoginBody {
     username :string;
-    email :string;
-    password : string;
-    fullname : string;
+    password:string;
 
 }
+
 interface AuthResponse {
-    token :string
+    token : string;
 }
 
-const Register = () => {
-    const navigate = useNavigate();
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const[fullname, setFullname] = useState("");
-    const [error, setError] = useState("");
+const Login =  () => {
+    const [username , setUsername] = useState("");
+    const [password , setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    
-    const handleRegister = async (e:React.FormEvent) => {
+    const [error, setError] = useState("")
+    const navigate = useNavigate();
+
+    const handleLogin = async (e:React.FormEvent) => {
         e.preventDefault;
-        setLoading(true);
-        setError("");
-
-        const body : RegisterBody  = {
-            username,
-            email,
-            password,
-            fullname
-
-        }
+        setLoading(true)
+        const body : LoginBody = {username, password}
         try {
-            const response = await api.post<AuthResponse>("/auth/register", body)
+            const response = await api.post<AuthResponse>("/auth/login", body)
             const token = response.data.token;
             localStorage.setItem("token", token);
             navigate("/dashboard");      
@@ -53,16 +43,17 @@ const Register = () => {
         }
     }
     return (
-        <form onSubmit = {handleRegister}>
+        <form onSubmit = {handleLogin}>
             <input type = "text"  placeholder = "Nombre de usuario" value = {username} onChange={(e) => setUsername(e.target.value)} />
-            <input type = {email} placeholder = "Correo Electronico" value = {email} onChange={(e) => setEmail(e.target.value)} />
+            
             <input type = {password} placeholder="contraseña" value = {password} onChange = {(e) => setPassword(e.target.value)} />
-            <input type = "text" placeholder="Nombre Completo" value={fullname} onChange = {(e) => setFullname(e.target.value)} />
+            
             <button type = "submit" disabled = {loading}>
                 {loading ? 'Registrando...' : 'Registrarse'}
             </button>
             {error && <p>{error}</p>}
         </form>
+
     )
 }
-export default Register
+export default Login;
